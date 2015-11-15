@@ -1,5 +1,6 @@
+#![crate_type="lib"]
+#![feature(no_std)]
 #![no_std]
-#![allow(ctypes)]
 
 enum Color {
     Black      = 0,
@@ -20,41 +21,16 @@ enum Color {
     White      = 15,
 }
 
-enum Option<T> {
-    None,
-    Some(T)
-}
-
-struct IntRange {
-    cur: int,
-    max: int
-}
-
-impl IntRange {
-    fn next(&mut self) -> Option<int> {
-        if self.cur < self.max {
-            self.cur += 1;
-            Some(self.cur - 1)
-        } else {
-            None
-        }
-    }
-}
-
-fn range(lo: int, hi: int) -> IntRange {
-    IntRange { cur: lo, max: hi }
-}
-
-fn clear_screen(background: Color) {
-    for i in range(0, 80 * 25) {
+fn clear_screen(color: u16) {
+    let max = 80 * 25;
+    for i in 0..max {
         unsafe {
-            *((0xb8000 + i * 2) as *mut u16) = (background as u16) << 12;
+            *((0xb8000 + i * 2) as *mut u16) = color << 12;
         }
     }
 }
 
 #[no_mangle]
-#[no_split_stack]
 pub fn main() {
-    clear_screen(LightRed);
+    clear_screen(Color::LightRed as u16);
 }
